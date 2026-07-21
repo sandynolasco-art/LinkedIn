@@ -974,7 +974,7 @@
         I design AI-powered automation systems that qualify leads, nurture customers, and generate predictable revenue—so you can focus on delivery, not admin.
       </p>
       <div class="hero-cta">
-        <button class="btn-primary" onclick="openModal('contactModal')">Book a 30-min Call</button>
+        <a href="#contact" class="btn-primary">Book a 30-min Call</a>
         <button class="btn-secondary" onclick="openModal('downloadModal')">Download CV</button>
       </div>
     </div>
@@ -1305,7 +1305,7 @@
         </div>
         <div class="testimonial-card">
           <p class="testimonial-quote">"Website, ads, chatbot, and follow-up. All connected. All working."</p>
-          <div class="testimonial-author"><div class="testimonial-avatar">AP</div><div><p class="testimonial-name">Ana P.</p><p class="testimonial-role">Marketing Dir. · Bolivia</p></div></div>
+          <div class="testimonial-author"><div class="testimonial-avatar">AG</div><div><p class="testimonial-name">Alfredo García</p><p class="testimonial-role">Marketing Dir. · Bolivia</p></div></div>
         </div>
         <div class="testimonial-card">
           <p class="testimonial-quote">"Finally someone who understands that design has to sell, not just look pretty."</p>
@@ -1387,6 +1387,9 @@
         <p class="form-subtitle">30 minutes to understand your growth challenge</p>
 
         <form id="contactForm">
+          <input type="hidden" name="_subject" value="New Interview Request — Portfolio Site">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
           <div class="form-group" style="--index: 0">
             <label for="name">Your Name</label>
             <input type="text" id="name" name="name" required>
@@ -1504,8 +1507,16 @@
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
 
-      setTimeout(() => {
-        messageEl.textContent = 'Thanks! Check your email for the calendar link.';
+      const data = new FormData(form);
+
+      fetch('https://formsubmit.co/ajax/sandynolasco@gmail.com', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: data
+      })
+      .then(response => response.json())
+      .then(() => {
+        messageEl.textContent = 'Thanks! I\'ll get back to you soon.';
         messageEl.classList.add('success');
         form.reset();
         submitBtn.disabled = false;
@@ -1514,7 +1525,13 @@
         setTimeout(() => {
           messageEl.classList.remove('success');
         }, 5000);
-      }, 1500);
+      })
+      .catch(() => {
+        messageEl.textContent = 'Something went wrong. Please email me directly at sandynolasco@gmail.com';
+        messageEl.classList.add('error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Schedule Interview';
+      });
     });
 
     function submitQuickForm(e) {
@@ -1526,7 +1543,12 @@
     }
 
     function downloadCV() {
-      alert('CV downloaded. In production, this will download the real file.');
+      const link = document.createElement('a');
+      link.href = 'Sandra_Hernandez_Nolasco_CV_EN.docx';
+      link.download = 'Sandra_Hernandez_Nolasco_CV_EN.docx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       closeModal('downloadModal');
     }
   </script>

@@ -188,31 +188,12 @@ footer a{color:var(--ink);text-decoration:none;font-weight:500;}
     <a href="#" class="nav-logo">Sandra Hernández Nolasco</a>
     <div class="nav-cta">
       <a href="index.html" class="nav-btn secondary">Home</a>
-      <button class="nav-btn secondary" onclick="openModal('contactModal')">Book Interview</button>
+      <a href="index.html#contact" class="nav-btn secondary">Book Interview</a>
       <button class="nav-btn primary" onclick="openModal('downloadModal')">Download Resume</button>
     </div>
   </nav>
 
   <!-- MODALS -->
-  <div id="contactModal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('contactModal')">×</button>
-      <h3 class="modal-title">Book Interview</h3>
-      <p class="modal-desc">Fill this out and I'll send you a calendar link to book a time that works for you.</p>
-      <form id="quickForm" onsubmit="submitQuickForm(event)">
-        <div class="form-group">
-          <label for="quickName">Name</label>
-          <input type="text" id="quickName" required>
-        </div>
-        <div class="form-group">
-          <label for="quickEmail">Email</label>
-          <input type="email" id="quickEmail" required>
-        </div>
-        <button type="submit" class="modal-save-btn">Send Calendar Link</button>
-      </form>
-    </div>
-  </div>
-
   <div id="downloadModal" class="modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal('downloadModal')">×</button>
@@ -531,15 +512,13 @@ function closeModal(modalId) {
 document.querySelectorAll('.modal').forEach(modal => {
   modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); });
 });
-function submitQuickForm(e) {
-  e.preventDefault();
-  const name = document.getElementById('quickName').value;
-  const email = document.getElementById('quickEmail').value;
-  alert(`Thanks ${name}! We'll send the calendar link to ${email}`);
-  closeModal('contactModal');
-}
 function downloadCV() {
-  alert('Your real resume will download here once you upload the PDF file.');
+  const link = document.createElement('a');
+  link.href = 'Sandra_Hernandez_Nolasco_CV_EN.docx';
+  link.download = 'Sandra_Hernandez_Nolasco_CV_EN.docx';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
   closeModal('downloadModal');
 }
 

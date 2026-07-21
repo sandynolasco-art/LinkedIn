@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Generador de Propuestas</title>
+<style>
+  :root {
+    --bg: #f4f4f0;
+    --ink: #1a1a1a;
+    --accent: #111;
+    --border: #e0e0e0;
+    --cream: #ffffff;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --success: #1a7a3c;
+    --error: #c0392b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .wrap {
+    max-width: 560px;
+    width: 100%;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.5rem;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin-bottom: 0.35rem;
+  }
+  .sub {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+  .field { margin-bottom: 1.1rem; }
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+  input, select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); }
+  fieldset {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.1rem;
+  }
+  legend {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0 0.4rem;
+  }
+  .chk-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0; font-size: 0.88rem; }
+  .chk-row input { width: auto; }
+  button {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+  button:disabled { opacity: 0.6; cursor: default; }
+  .msg { margin-top: 1rem; font-size: 0.9rem; text-align: center; min-height: 1.2em; }
+  .msg.success { color: var(--success); }
+  .msg.error { color: var(--error); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>Generador de Propuestas</h1>
+  <p class="sub">Completa los datos del prospecto. Se genera la propuesta y se envía directo a tu email — nadie más la ve.</p>
+
+  <form id="proposalForm">
+    <div class="field">
+      <label for="clientName">Nombre del cliente / marca</label>
+      <input type="text" id="clientName" required>
+    </div>
+
+    <div class="field">
+      <label for="industry">Rubro</label>
+      <select id="industry" required>
+        <option value="">Selecciona uno</option>
+        <option value="construccion">Construcción / Industrial</option>
+        <option value="salud">Salud / Clínicas</option>
+        <option value="inmobiliaria">Inmobiliaria</option>
+        <option value="ecommerce">E-commerce</option>
+        <option value="legal">Legal</option>
+        <option value="educacion">Educación</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+
+    <fieldset>
+      <legend>Canales que ya usa</legend>
+      <label class="chk-row"><input type="checkbox" value="Sitio web"> Sitio web</label>
+      <label class="chk-row"><input type="checkbox" value="Redes sociales"> Redes sociales</label>
+      <label class="chk-row"><input type="checkbox" value="LinkedIn"> LinkedIn</label>
+      <label class="chk-row"><input type="checkbox" value="Google Ads"> Google Ads</label>
+      <label class="chk-row"><input type="checkbox" value="Ninguno todavía"> Ninguno todavía</label>
+    </fieldset>
+
+    <div class="field">
+      <label for="notes">Notas rápidas (opcional — lo que viste al investigar)</label>
+      <input type="text" id="notes" placeholder="Ej: sitio lento, sin blog, redes inactivas...">
+    </div>
+
+    <button type="submit" id="submitBtn">Generar y Enviar a mi Email</button>
+    <div class="msg" id="msg"></div>
+  </form>
+</div>
+
+<script>
+const industryLabels = {
+  construccion: "Construcción / Industrial",
+  salud: "Salud / Clínicas",
+  inmobiliaria: "Inmobiliaria",
+  ecommerce: "E-commerce",
+  legal: "Legal",
+  educacion: "Educación",
+  otro: "el rubro de la marca"
+};
+
+// Bancos de frases por rubro — se combinan según lo seleccionado
+const problemBank = {
+  construccion: ["baja visibilidad en búsquedas locales de proveedores/servicios del rubro", "falta de contenido técnico que genere confianza con distribuidores y constructoras", "sin sistema de seguimiento a cotizaciones/leads industriales"],
+  salud: ["baja captación de pacientes nuevos vía canales digitales", "seguimiento manual que pierde leads fuera de horario", "sin automatización de agenda ni recordatorios"],
+  inmobiliaria: ["alto gasto en publicidad sin proceso claro de seguimiento a compradores", "baja segmentación de campañas por tipo de propiedad", "sin CRM conectado a los canales de captación"],
+  ecommerce: ["tráfico sin conversión proporcional", "checkout o UX que genera fricción en la compra", "sin remarketing automatizado por abandono de carrito"],
+  legal: ["consultas de clientes potenciales sin respuesta oportuna", "sin enrutamiento inteligente de leads al equipo correcto", "presencia digital que no transmite autoridad en el nicho"],
+  educacion: ["dependencia de redes sociales sin web propia sólida", "sin automatización de procesos (inscripciones, encuestas, seguimiento)", "contenido disperso sin estrategia de captación"],
+  otro: ["baja visibilidad digital frente a la competencia", "procesos manuales que hacen perder leads", "falta de métricas claras para tomar decisiones"]
+};
+
+const solutionSteps = ["SEO técnico y de contenido", "Estrategia de contenido orientada a conversión", "Automatización de procesos y seguimiento", "Campañas de Ads segmentadas", "Dashboard de métricas en tiempo real"];
+
+const benefitBank = {
+  construccion: "más cotizaciones calificadas de distribuidores y constructoras, menos tiempo perdido en seguimiento manual, e imagen de marca más sólida frente al sector industrial",
+  salud: "más pacientes agendados sin intervención manual, menor pérdida de leads fuera de horario, y una experiencia más profesional para quien busca atención",
+  inmobiliaria: "más propiedades cerradas por ciclo de venta, mejor calidad de leads, y visibilidad clara de qué canal realmente vende",
+  ecommerce: "mayor tasa de conversión sobre el mismo tráfico, recuperación de carritos abandonados, y más ingresos sin aumentar gasto en ads",
+  legal: "respuesta inmediata a consultas, mejor tasa de cierre, y una imagen de mayor autoridad frente a la competencia",
+  educacion: "más inscripciones sin depender solo de redes, procesos administrativos automatizados, y mejor experiencia para el alumno",
+  otro: "más leads calificados, procesos más eficientes, y decisiones basadas en datos reales"
+};
+
+document.getElementById('proposalForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const submitBtn = document.getElementById('submitBtn');
+  const msg = document.getElementById('msg');
+  const clientName = document.getElementById('clientName').value.trim();
+  const industryKey = document.getElementById('industry').value;
+  const industryName = industryLabels[industryKey] || industryKey;
+  const notes = document.getElementById('notes').value.trim();
+  const channels = Array.from(document.querySelectorAll('fieldset input:checked')).map(c => c.value);
+
+  const problems = problemBank[industryKey] || problemBank.otro;
+  const benefit = benefitBank[industryKey] || benefitBank.otro;
+
+  let proposalText = `PROPUESTA — ${clientName}\n`;
+  proposalText += `Rubro: ${industryName}\n`;
+  proposalText += `Canales actuales: ${channels.length ? channels.join(', ') : 'No especificado'}\n`;
+  if (notes) proposalText += `Notas de investigación: ${notes}\n`;
+  proposalText += `\nPROBLEMAS IDENTIFICADOS:\n`;
+  problems.forEach((p, i) => proposalText += `${i + 1}. ${p.charAt(0).toUpperCase() + p.slice(1)}\n`);
+  proposalText += `\nOBJETIVO PRINCIPAL:\nAumentar leads/ventas calificadas de ${clientName} en 90 días.\n`;
+  proposalText += `\nPLAN ESCALONADO:\n${solutionSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n`;
+  proposalText += `\nBENEFICIOS PARA LA MARCA:\n${clientName} obtendrá ${benefit}.\n`;
+  proposalText += `\nCTA: Prueba de 30 días sin compromiso para validar resultados antes de un contrato mayor.\n`;
+  if (industryKey === 'construccion') {
+    proposalText += `\nExtra: incluir publicaciones profesionales en LinkedIn dirigidas a distribuidores, empresas constructoras y profesionales del rubro industrial, para reforzar imagen de marca y confianza corporativa.\n`;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enviando...';
+  msg.textContent = '';
+  msg.className = 'msg';
+
+  const data = new FormData();
+  data.append('_subject', `Propuesta generada: ${clientName}`);
+  data.append('_captcha', 'false');
+  data.append('cliente', clientName);
+  data.append('rubro', industryName);
+  data.append('propuesta_completa', proposalText);
+
+  fetch('https://formsubmit.co/ajax/sandynolasco@gmail.com', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json' },
+    body: data
+  })
+  .then(r => r.json())
+  .then(() => {
+    msg.textContent = 'Enviado a tu email.';
+    msg.classList.add('success');
+    document.getElementById('proposalForm').reset();
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Generar y Enviar a mi Email';
+  })
+  .catch(() => {
+    msg.textContent = 'Error al enviar. Intenta de nuevo.';
+    msg.classList.add('error');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Generar y Enviar a mi Email';
+  });
+});
+</script>
+</body>
+</html>
